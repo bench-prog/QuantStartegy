@@ -1,0 +1,16 @@
+# Grafana 数据源预配置 — InfluxDB 2.x (Flux)
+apiVersion: 1
+datasources:
+  - name: InfluxDB-Quant
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: quant
+      defaultBucket: quant_strategy
+      tlsSkipVerify: true
+    secureJsonData:
+      token: quant-token-change-me
+    isDefault: true
+    editable: false
