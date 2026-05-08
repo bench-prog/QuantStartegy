@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantStrategy 策略仓库</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --fg: #c9d1d9;
+      --muted: #8b949e;
+      --border: #30363d;
+      --card-bg: #161b22;
+      --accent: #58a6ff;
+      --accent-dim: rgba(88,166,255,0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      line-height: 1.7;
+    }
+    h1 { font-size: 2rem; margin-bottom: 8px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+    h2 { color: var(--accent); margin-top: 30px; }
+    h3 { color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+    th { background: var(--card-bg); color: var(--fg); }
+    tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    code { background: var(--card-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; border: 1px solid var(--border); }
+    .file { font-family: monospace; color: var(--accent); }
+    .note { background: rgba(88,166,255,0.12); border-left: 4px solid var(--accent); padding: 12px 16px; margin: 15px 0; }
+    ul { padding-left: 20px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    nav a { color: var(--muted); padding: 4px 10px; border-radius: 4px; font-size: 0.9rem; transition: all 0.15s; }
+    nav a:hover { color: var(--fg); background: var(--card-bg); text-decoration: none; }
+    nav a.active { color: var(--fg); background: var(--accent-dim); font-weight: 600; }
+    nav .sep { color: var(--border); margin: 0 2px; user-select: none; }
+    .footer-nav { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .footer-nav a { font-size: 0.9rem; }
+    .footer-nav .prev::before { content: "← "; }
+    .footer-nav .next::after { content: " →"; }
+    .dir-tree { font-family: monospace; font-size: 0.85rem; line-height: 1.8; color: var(--muted); background: var(--card-bg); padding: 16px 20px; border-radius: 6px; border: 1px solid var(--border); overflow-x: auto; white-space: pre; }
+    .dir-tree strong { color: var(--fg); }
+    .dir-tree a { font-family: monospace; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="00-overview.html" class="active">总览</a>
+    <span class="sep">|</span>
+    <a href="01-trend-following.html">01 趋势跟踪</a>
+    <span class="sep">|</span>
+    <a href="02-mean-reversion.html">02 均值回归</a>
+    <span class="sep">|</span>
+    <a href="03-volatility.html">03 波动率</a>
+    <span class="sep">|</span>
+    <a href="04-pattern-recognition.html">04 模式识别</a>
+    <span class="sep">|</span>
+    <a href="05-cross-sectional.html">05 横截面多因子</a>
+    <span class="sep">|</span>
+    <a href="06-orderbook-depth.html">06 订单簿深度</a>
+  </nav>
+
+  <h1>QuantStrategy</h1>
+  <p class="subtitle">基于 NautilusTrader 的量化策略仓库 &mdash; 方法论分类索引</p>
+
+  <h2>策略总览</h2>
+  <table>
+    <tr>
+      <th style="width:50px">序号</th>
+      <th>分类</th>
+      <th>概览文档</th>
+      <th>策略文件</th>
+    </tr>
+    <tr>
+      <td>01</td>
+      <td><strong>趋势跟踪</strong></td>
+      <td><a href="01-trend-following.html">01-trend-following.html</a></td>
+      <td><span class="file">ema_cross.py</span> <span class="file">donchian_breakout.py</span> <span class="file">roc_momentum.py</span></td>
+    </tr>
+    <tr>
+      <td>02</td>
+      <td><strong>均值回归</strong></td>
+      <td><a href="02-mean-reversion.html">02-mean-reversion.html</a></td>
+      <td><span class="file">bollinger_reversion.py</span> <span class="file">rsi_reversion.py</span></td>
+    </tr>
+    <tr>
+      <td>03</td>
+      <td><strong>波动率</strong></td>
+      <td><a href="03-volatility.html">03-volatility.html</a></td>
+      <td><span class="file">atr_trailing_stop.py</span> <span class="file">keltner_breakout.py</span></td>
+    </tr>
+    <tr>
+      <td>04</td>
+      <td><strong>模式识别</strong></td>
+      <td><a href="04-pattern-recognition.html">04-pattern-recognition.html</a></td>
+      <td><span class="file">engulfing_pattern.py</span></td>
+    </tr>
+    <tr>
+      <td>05</td>
+      <td><strong>横截面多因子</strong></td>
+      <td><a href="05-cross-sectional.html">05-cross-sectional.html</a></td>
+      <td><span class="file">volume_price_momentum.py</span> <span class="file">pair_trading.py</span> <span class="file">multi_asset_momentum.py</span></td>
+    </tr>
+    <tr>
+      <td>06</td>
+      <td><strong>订单簿深度</strong></td>
+      <td><a href="06-orderbook-depth.html">06-orderbook-depth.html</a></td>
+      <td><span class="file">orderbook_imbalance.py</span> <span class="file">simple_market_maker.py</span> <span class="file">quote_fade.py</span></td>
+    </tr>
+  </table>
+
+  <h2>目录结构</h2>
+  <div class="dir-tree">
+strategies/
+├── <strong>__init__.py</strong>
+├── <strong>docs/</strong>
+│   ├── <a href="00-overview.html">00-overview.html</a>
+│   ├── <a href="01-trend-following.html">01-trend-following.html</a>
+│   ├── <a href="02-mean-reversion.html">02-mean-reversion.html</a>
+│   ├── <a href="03-volatility.html">03-volatility.html</a>
+│   ├── <a href="04-pattern-recognition.html">04-pattern-recognition.html</a>
+│   ├── <a href="05-cross-sectional.html">05-cross-sectional.html</a>
+│   └── <a href="06-orderbook-depth.html">06-orderbook-depth.html</a>
+├── <strong>trend_following/</strong>
+│   ├── ema_cross.py
+│   ├── donchian_breakout.py
+│   └── roc_momentum.py
+├── <strong>mean_reversion/</strong>
+│   ├── bollinger_reversion.py
+│   └── rsi_reversion.py
+├── <strong>volatility/</strong>
+│   ├── atr_trailing_stop.py
+│   └── keltner_breakout.py
+├── <strong>pattern_recognition/</strong>
+│   └── engulfing_pattern.py
+├── <strong>cross_sectional/</strong>
+│   ├── volume_price_momentum.py
+│   ├── pair_trading.py
+│   └── multi_asset_momentum.py
+└── <strong>orderbook_depth/</strong>
+    ├── orderbook_imbalance.py
+    ├── simple_market_maker.py
+    └── quote_fade.py
+  </div>
+
+  <h2>快速切换策略回测</h2>
+  <p>修改 <code>run_backtest.py</code> 中的导入和配置即可切换策略：</p>
+  <pre><code># 示例：切换到布林带回归策略
+from strategies.mean_reversion.bollinger_reversion import BollingerReversion, BollingerReversionConfig
+
+STRATEGY_CLS = BollingerReversion
+CONFIG_CLS   = BollingerReversionConfig
+STRATEGY_PARAMS = {
+    "period": 20,
+    "std_dev": Decimal("2.0"),
+    "trade_size": Decimal("100000"),
+}</code></pre>
+
+  <div class="note">
+    <strong>实盘接入：</strong>参考 <code>run_live.py</code> 中的 Binance 网关配置注释，填入 API Key 即可对接 Binance 现货/合约实盘。适配器已封装 K 线、深度、成交、24h 统计、资金费率、持仓量等数据源。
+  </div>
+
+  <div class="footer-nav">
+    <span></span>
+    <a class="next" href="01-trend-following.html">01 趋势跟踪</a>
+  </div>
+
+  <p style="margin-top:20px; color: var(--muted); font-size: 0.9rem;">
+    Powered by <a href="https://nautilustrader.io" target="_blank">NautilusTrader</a> &middot; 14 strategies &middot; 6 categories
+  </p>
+
+</body>
+</html>

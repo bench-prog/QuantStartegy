@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02 均值回归策略概览</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --fg: #c9d1d9;
+      --muted: #8b949e;
+      --border: #30363d;
+      --card-bg: #161b22;
+      --accent: #3fb950;
+      --accent-dim: rgba(63,185,80,0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      line-height: 1.7;
+    }
+    h1 { font-size: 2rem; margin-bottom: 8px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+    h2 { color: var(--accent); margin-top: 30px; }
+    h3 { color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+    th { background: var(--card-bg); color: var(--fg); }
+    tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    code { background: var(--card-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; border: 1px solid var(--border); }
+    .file { font-family: monospace; color: var(--accent); }
+    .note { background: rgba(63,185,80,0.12); border-left: 4px solid var(--accent); padding: 12px 16px; margin: 15px 0; }
+    ul { padding-left: 20px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav { margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    nav a { color: var(--muted); padding: 4px 10px; border-radius: 4px; font-size: 0.9rem; transition: all 0.15s; }
+    nav a:hover { color: var(--fg); background: var(--card-bg); text-decoration: none; }
+    nav a.active { color: var(--fg); background: var(--accent-dim); font-weight: 600; }
+    nav .sep { color: var(--border); margin: 0 2px; user-select: none; }
+    .footer-nav { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .footer-nav a { font-size: 0.9rem; }
+    .footer-nav .prev::before { content: "← "; }
+    .footer-nav .next::after { content: " →"; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="00-overview.html">总览</a>
+    <span class="sep">|</span>
+    <a href="01-trend-following.html">01 趋势跟踪</a>
+    <span class="sep">|</span>
+    <a href="02-mean-reversion.html" class="active">02 均值回归</a>
+    <span class="sep">|</span>
+    <a href="03-volatility.html">03 波动率</a>
+    <span class="sep">|</span>
+    <a href="04-pattern-recognition.html">04 模式识别</a>
+    <span class="sep">|</span>
+    <a href="05-cross-sectional.html">05 横截面多因子</a>
+    <span class="sep">|</span>
+    <a href="06-orderbook-depth.html">06 订单簿深度</a>
+  </nav>
+
+  <h1>02 均值回归策略（Mean Reversion）</h1>
+
+  <h2>核心假设</h2>
+  <ul>
+    <li>价格围绕均值波动，极端偏离后回归</li>
+    <li>高胜率、低盈亏比，适合震荡行情</li>
+    <li>在趋势行情中可能连续止损</li>
+  </ul>
+
+  <h2>策略列表</h2>
+
+  <h3>Bollinger Bands Mean Reversion</h3>
+  <p>布林带由中轨（SMA）± kσ 构成。价格触及上轨做空，触及下轨做多，回归中轨平仓。</p>
+  <p><span class="file">bollinger_reversion.py</span> — 经典回归策略，参数（周期、k 值）决定通道宽度。</p>
+
+  <h3>RSI Overbought/Oversold</h3>
+  <p>RSI > overbought 视为超买做空；RSI < oversold 视为超卖做多。回归中性区平仓。</p>
+  <p><span class="file">rsi_reversion.py</span> — 动量震荡指标的回归用法，信号频率较高。</p>
+
+  <h2>参数速查</h2>
+  <table>
+    <tr><th>策略</th><th>关键参数</th><th>默认值</th></tr>
+    <tr><td>Bollinger Reversion</td><td>period, std_dev</td><td>20, 2.0</td></tr>
+    <tr><td>RSI Reversion</td><td>period, overbought, oversold</td><td>14, 70, 30</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>回测建议：</strong>回归策略在震荡行情表现好，趋势行情可能连续止损。建议加波动率收缩过滤（如 ATR 低于近期均值时开仓），或叠加趋势方向过滤（只在趋势反方向做回归）。
+  </div>
+
+  <div class="footer-nav">
+    <a class="prev" href="01-trend-following.html">01 趋势跟踪</a>
+    <a class="next" href="03-volatility.html">03 波动率</a>
+  </div>
+
+</body>
+</html>
