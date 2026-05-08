@@ -1,0 +1,62 @@
+# ============================================================================
+# Grafana + InfluxDB 监控栈一键启动
+# 用法: docker compose -f docker-compose.monitoring.yml up -d
+# 访问:
+#   - Grafana: http://localhost:3000  (admin / admin)
+#   - InfluxDB: http://localhost:8086  (quant / quant-token-change-me)
+# ============================================================================
+
+version: "3.8"
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: quant-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: quant
+      DOCKER_INFLUXDB_INIT_PASSWORD: quant-password-change-me
+      DOCKER_INFLUXDB_INIT_ORG: quant
+      DOCKER_INFLUXDB_INIT_BUCKET: quant_strategy
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: quant-token-change-me
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: quant-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""
+      # 预配置 InfluxDB 数据源
+      GF_DATASOURCE_INFLUXDB_TYPE: influxdb
+      GF_DATASOURCE_INFLUXDB_ACCESS: proxy
+      GF_DATASOURCE_INFLUXDB_URL: http://influxdb:8086
+      GF_DATASOURCE_INFLUXDB_BASIC_AUTH: "false"
+      GF_DATASOURCE_INFLUXDB_JSON_DATA_DEFAULT_BUCKET: quant_strategy
+      GF_DATASOURCE_INFLUXDB_JSON_DATA_HTTP_MODE: POST
+      GF_DATASOURCE_INFLUXDB_JSON_DATA_VERSION: Flux
+      GF_DATASOURCE_INFLUXDB_SECURE_JSON_DATA_TOKEN: quant-token-change-me
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      influxdb:
+        condition: service_healthy
+
+volumes:
+  influxdb-data:
+  grafana-data:

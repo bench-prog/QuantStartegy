@@ -1,9 +1,11 @@
 """
 单策略回测脚本 — 由 batch_backtest.py 通过 subprocess 调用
-用法: python backtest_one.py <strategy_key>
+用法: python backtest_one.py <strategy_key> [--metrics]
 """
 
+import argparse
 import json
+import os
 import sys
 import time
 from decimal import Decimal
@@ -38,6 +40,14 @@ from strategies.volatility.keltner_breakout import KeltnerBreakout, KeltnerBreak
 # ── 形态识别 ──
 from strategies.pattern_recognition.engulfing_pattern import EngulfingPattern, EngulfingPatternConfig
 
+# ── 监控（可选） ──
+try:
+    from grafana import InfluxMetricsExporter, MetricsActor
+
+    _HAS_GRAFANA = True
+except ImportError:
+    _HAS_GRAFANA = False
+
 
 DATA_CSV = "data/fxcm/gbpusd-m1-ask-2012.csv"
 CURRENCY_PAIR = "GBP/USD"
@@ -60,8 +70,16 @@ STRATEGIES = {
 
 
 def main():
-    key = sys.argv[1]
-    name = sys.argv[2] if len(sys.argv) > 2 else key
+    parser = argparse.ArgumentParser(description="单策略回测")
+    parser.add_argument("key", help="策略 key")
+    parser.add_argument("name", nargs="?", default=None, help="策略显示名称")
+    parser.add_argument("--metrics", action="store_true", help="启用 InfluxDB 监控导出")
+    parser.add_argument("--influx-url", default=os.getenv("INFLUX_URL", "http://localhost:8086"))
+    parser.add_argument("--influx-token", default=os.getenv("INFLUX_TOKEN", "quant-token-change-me"))
+    args = parser.parse_args()
+
+    key = args.key
+    name = args.name or key
     strategy_cls, config_cls, params = STRATEGIES[key]
 
     t0 = time.perf_counter()
@@ -94,17 +112,30 @@ def main():
     strategy = strategy_cls(config)
     engine.add_strategy(strategy)
 
+    # ── 可选：注入监控 Actor ──
+    metrics_actor = None
+    if args.metrics and _HAS_GRAFANA:
+        exporter = InfluxMetricsExporter(
+            url=args.influx_url,
+            token=args.influx_token,
+        )
+        metrics_actor = MetricsActor(exporter, strategy_key=key, instrument_id=instrument.id)
+        engine.add_actor(metrics_actor)
+
+    total: float | None = None
+    pnl: float | None = None
     try:
         engine.run()
         account = engine.portfolio.account(venue)
         balances = account.balances()  # dict[Currency, AccountBalance]
         total = float(sum(b.total.as_double() for b in balances.values())) if balances else 0.0
+        pnl = total - STARTING_CAPITAL
         result = {
             "name": name,
             "bars": len(bars),
             "orders": len(engine.cache.orders()),
             "positions": len(engine.cache.positions()),
-            "pnl": total - STARTING_CAPITAL,
+            "pnl": pnl,
             "elapsed": round(time.perf_counter() - t0, 2),
             "status": "ok",
         }
@@ -121,6 +152,11 @@ def main():
         }
     finally:
         engine.dispose()
+
+    # 回测结束后采样最终净值并 flush metrics
+    if metrics_actor is not None and total is not None and pnl is not None:
+        metrics_actor.sample_equity(total=total, pnl=pnl)
+        metrics_actor.exporter.close()
 
     print(json.dumps(result))
 

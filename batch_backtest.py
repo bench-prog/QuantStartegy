@@ -4,6 +4,7 @@
 用法: python batch_backtest.py
 """
 
+import argparse
 import json
 import subprocess
 import sys
@@ -27,13 +28,20 @@ STRATEGY_KEYS = [
 
 
 def main():
+    parser = argparse.ArgumentParser(description="批量回测所有 OHLCV-only 策略")
+    parser.add_argument("--metrics", action="store_true", help="启用 InfluxDB 监控导出")
+    args = parser.parse_args()
+
     results = []
     total = len(STRATEGY_KEYS)
 
     for i, (key, name) in enumerate(STRATEGY_KEYS, 1):
         print(f"[{i}/{total}] Running {name} ...", end=" ", flush=True)
+        cmd = [sys.executable, "backtest_one.py", key, name]
+        if args.metrics:
+            cmd.append("--metrics")
         proc = subprocess.run(
-            [sys.executable, "backtest_one.py", key, name],
+            cmd,
             capture_output=True, text=True, timeout=300,
         )
         if proc.returncode != 0:
