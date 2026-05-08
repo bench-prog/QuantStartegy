@@ -38,7 +38,7 @@ class MetricsActor(Actor):
         self.subscribe_order_cancels(self.instrument_id)
 
     def on_stop(self) -> None:
-        self.exporter.close()
+        self.exporter.flush()
 
     # ------------------------------------------------------------------ #
     #  订单事件

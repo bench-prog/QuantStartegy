@@ -282,17 +282,23 @@ class InfluxMetricsExporter:
         t = threading.Thread(target=_loop, daemon=True, name="influx-flusher")
         t.start()
 
-    def close(self) -> None:
-        """关闭连接前强制 flush 剩余数据。可安全多次调用。"""
+    def flush(self) -> None:
+        """强制 flush buffer 中的数据（不关闭连接）。"""
         with self._lock:
             self._flush()
+
+    def close(self) -> None:
+        """关闭连接前强制 flush 剩余数据。可安全多次调用。"""
+        self.flush()
         if self._closed:
             return
         self._closed = True
         if self._write_api is not None:
             self._write_api.close()
+            self._write_api = None
         if self._client is not None:
             self._client.close()
+            self._client = None
 
     def __enter__(self) -> InfluxMetricsExporter:
         return self
