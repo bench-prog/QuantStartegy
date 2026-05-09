@@ -16,7 +16,7 @@ from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.model.data import BarType
 from nautilus_trader.model import TraderId
-from nautilus_trader.model.enums import AccountType, OmsType
+from nautilus_trader.model.enums import AccountType, OmsType, OrderSide
 from nautilus_trader.model.identifiers import Venue
 from nautilus_trader.model.objects import Money
 from nautilus_trader.persistence.wranglers import BarDataWrangler
@@ -151,11 +151,30 @@ def main():
             "note": str(e)[:200],
         }
     finally:
+        # 写入已平仓交易明细
+        if metrics_actor is not None:
+            try:
+                for pos in engine.cache.positions_closed():
+                    if not pos.events:
+                        continue
+                    side = "LONG" if pos.events[0].order_side == OrderSide.BUY else "SHORT"
+                    metrics_actor.exporter.write_trade(
+                        strategy=key,
+                        side=side,
+                        quantity=float(pos.peak_qty.as_double()),
+                        entry_price=float(pos.avg_px_open),
+                        exit_price=float(pos.avg_px_close),
+                        pnl=float(pos.realized_pnl.as_double()),
+                        ts_ns=pos.ts_closed,
+                    )
+            except Exception:
+                pass
         engine.dispose()
 
     # 回测结束后采样最终净值并 flush metrics
     if metrics_actor is not None and total is not None and pnl is not None:
-        metrics_actor.sample_equity(total=total, pnl=pnl)
+        last_ts = (bars[-1].ts_event if bars else None) or int(time.time() * 1e9)
+        metrics_actor.sample_equity(total=total, pnl=pnl, ts_ns=last_ts)
         metrics_actor.exporter.close()
 
     print(json.dumps(result))

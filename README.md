@@ -81,6 +81,23 @@ on_order_filled()  ◄───────────────────�
 
 策略通过 `StrategyConfig`（Pydantic BaseModel, frozen=True）声明参数，运行时由外部注入配置，策略本身无硬编码参数，便于批量回测和参数优化。
 
+### 1.7 Grafana监控面板
+
+### 1.7.1 启动/停止监控栈
+docker compose -f docker-compose.monitoring.yml up -d
+docker compose -f docker-compose.monitoring.yml down
+
+### 1.7.2 启动/停止 colima
+colima start
+colima stop
+
+### 1.7.3 带监控回测
+conda run -n nautilus_trader python backtest_one.py ema_cross --metrics
+
+### 1.7.4 打开 Grafana
+open http://localhost:3000/d/quant-backtest
+
+
 ## 2. 策略注册机制
 
 策略通过 `register()` 函数注册元信息（key、名称、描述、配置类、策略类、默认参数），便于上层系统动态加载。
