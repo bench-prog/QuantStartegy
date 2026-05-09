@@ -5,6 +5,9 @@
 ## 快速开始
 
 ```bash
+# 0.（macOS）确保 colima 已启动
+colima start
+
 # 1. 启动 InfluxDB + Grafana
 docker compose -f docker-compose.monitoring.yml up -d
 
