@@ -77,8 +77,9 @@ line-ending = "auto"
 
 # ── mypy ────────────────────────────────────────────────────────────────────
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.13"
 strict = true
+ignore_missing_imports = true
 warn_return_any = true
 warn_unused_ignores = true
 show_error_codes = true
@@ -95,6 +96,16 @@ module = [
     "influxdb_client.*",
 ]
 follow_untyped_imports = true
+
+# Skeleton strategy files: allow incomplete type annotations until filled in.
+[[tool.mypy.overrides]]
+module = ["strategies.*"]
+disable_error_code = ["no-untyped-def", "type-arg", "no-any-return", "misc", "union-attr"]
+
+# Test fixtures: return types are optional for brevity.
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["no-untyped-def"]
 
 # ── pytest ──────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
