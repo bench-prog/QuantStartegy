@@ -77,7 +77,7 @@ class MultiAssetMomentum(Strategy):
             bars = self.cache.bars(bar_type)
             if len(bars) < self.config.lookback + 1:
                 continue
-            recent = list(bars)[-self.config.lookback:]
+            recent = list(bars)[-self.config.lookback :]
             if len(recent) < 2:
                 continue
             start_price = float(recent[0].close)
@@ -95,7 +95,7 @@ class MultiAssetMomentum(Strategy):
             return
 
         scores.sort(key=lambda x: x[1], reverse=True)
-        top_k_ids = {s[0] for s in scores[:self.config.top_k]}
+        top_k_ids = {s[0] for s in scores[: self.config.top_k]}
 
         self.log.info(
             f"Rebalance @ bar {self.bar_count}: top {self.config.top_k} = {[str(i) for i in top_k_ids]}",

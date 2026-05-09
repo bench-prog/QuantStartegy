@@ -6,39 +6,44 @@
 import argparse
 import json
 import os
-import sys
 import time
 from decimal import Decimal
 
 import pandas as pd
 from nautilus_trader.backtest.engine import BacktestEngine
 from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
+from nautilus_trader.model import TraderId
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.model.data import BarType
-from nautilus_trader.model import TraderId
 from nautilus_trader.model.enums import AccountType, OmsType, OrderSide
 from nautilus_trader.model.identifiers import Venue
 from nautilus_trader.model.objects import Money
 from nautilus_trader.persistence.wranglers import BarDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 
-# ── 趋势跟踪 ──
-from strategies.trend_following.ema_cross import EMACross, EMACrossConfig
-from strategies.trend_following.donchian_breakout import DonchianBreakout, DonchianBreakoutConfig
-from strategies.trend_following.roc_momentum import ROCMomentum, ROCMomentumConfig
-from strategies.trend_following.supertrend import SuperTrend, SuperTrendConfig
-
 # ── 均值回归 ──
-from strategies.mean_reversion.bollinger_reversion import BollingerReversion, BollingerReversionConfig
+from strategies.mean_reversion.bollinger_reversion import (
+    BollingerReversion,
+    BollingerReversionConfig,
+)
 from strategies.mean_reversion.grid_trading import GridTrading, GridTradingConfig
 from strategies.mean_reversion.rsi_reversion import RSIReversion, RSIReversionConfig
+
+# ── 形态识别 ──
+from strategies.pattern_recognition.engulfing_pattern import (
+    EngulfingPattern,
+    EngulfingPatternConfig,
+)
+from strategies.trend_following.donchian_breakout import DonchianBreakout, DonchianBreakoutConfig
+
+# ── 趋势跟踪 ──
+from strategies.trend_following.ema_cross import EMACross, EMACrossConfig
+from strategies.trend_following.roc_momentum import ROCMomentum, ROCMomentumConfig
+from strategies.trend_following.supertrend import SuperTrend, SuperTrendConfig
 
 # ── 波动率 ──
 from strategies.volatility.atr_trailing_stop import ATRTrailingStop, ATRTrailingStopConfig
 from strategies.volatility.keltner_breakout import KeltnerBreakout, KeltnerBreakoutConfig
-
-# ── 形态识别 ──
-from strategies.pattern_recognition.engulfing_pattern import EngulfingPattern, EngulfingPatternConfig
 
 # ── 监控（可选） ──
 try:
@@ -56,16 +61,72 @@ STARTING_CAPITAL = 1_000_000
 DEFAULT_TRADE_SIZE = Decimal("100000")
 
 STRATEGIES = {
-    "ema_cross": (EMACross, EMACrossConfig, {"trade_size": DEFAULT_TRADE_SIZE, "fast_ema_period": 10, "slow_ema_period": 20}),
-    "donchian_breakout": (DonchianBreakout, DonchianBreakoutConfig, {"trade_size": DEFAULT_TRADE_SIZE, "period": 20}),
-    "roc_momentum": (ROCMomentum, ROCMomentumConfig, {"trade_size": DEFAULT_TRADE_SIZE, "roc_period": 10, "threshold": Decimal("0.0")}),
-    "supertrend": (SuperTrend, SuperTrendConfig, {"trade_size": DEFAULT_TRADE_SIZE, "atr_period": 10, "multiplier": Decimal("3.0")}),
-    "bollinger_reversion": (BollingerReversion, BollingerReversionConfig, {"trade_size": DEFAULT_TRADE_SIZE, "period": 20, "std_dev": Decimal("2.0")}),
-    "grid_trading": (GridTrading, GridTradingConfig, {"trade_size": DEFAULT_TRADE_SIZE, "grid_lower": Decimal("1.55"), "grid_upper": Decimal("1.60"), "grid_count": 10, "max_position_grids": 5}),
-    "rsi_reversion": (RSIReversion, RSIReversionConfig, {"trade_size": DEFAULT_TRADE_SIZE, "period": 14, "overbought": Decimal("70"), "oversold": Decimal("30")}),
-    "atr_trailing_stop": (ATRTrailingStop, ATRTrailingStopConfig, {"trade_size": DEFAULT_TRADE_SIZE, "atr_period": 14, "atr_mult": Decimal("3.0")}),
-    "keltner_breakout": (KeltnerBreakout, KeltnerBreakoutConfig, {"trade_size": DEFAULT_TRADE_SIZE, "ema_period": 20, "atr_period": 14, "atr_mult": Decimal("2.0")}),
-    "engulfing_pattern": (EngulfingPattern, EngulfingPatternConfig, {"trade_size": DEFAULT_TRADE_SIZE, "use_trend_filter": True}),
+    "ema_cross": (
+        EMACross,
+        EMACrossConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "fast_ema_period": 10, "slow_ema_period": 20},
+    ),
+    "donchian_breakout": (
+        DonchianBreakout,
+        DonchianBreakoutConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "period": 20},
+    ),
+    "roc_momentum": (
+        ROCMomentum,
+        ROCMomentumConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "roc_period": 10, "threshold": Decimal("0.0")},
+    ),
+    "supertrend": (
+        SuperTrend,
+        SuperTrendConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "atr_period": 10, "multiplier": Decimal("3.0")},
+    ),
+    "bollinger_reversion": (
+        BollingerReversion,
+        BollingerReversionConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "period": 20, "std_dev": Decimal("2.0")},
+    ),
+    "grid_trading": (
+        GridTrading,
+        GridTradingConfig,
+        {
+            "trade_size": DEFAULT_TRADE_SIZE,
+            "grid_lower": Decimal("1.55"),
+            "grid_upper": Decimal("1.60"),
+            "grid_count": 10,
+            "max_position_grids": 5,
+        },
+    ),
+    "rsi_reversion": (
+        RSIReversion,
+        RSIReversionConfig,
+        {
+            "trade_size": DEFAULT_TRADE_SIZE,
+            "period": 14,
+            "overbought": Decimal("70"),
+            "oversold": Decimal("30"),
+        },
+    ),
+    "atr_trailing_stop": (
+        ATRTrailingStop,
+        ATRTrailingStopConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "atr_period": 14, "atr_mult": Decimal("3.0")},
+    ),
+    "keltner_breakout": (
+        KeltnerBreakout,
+        KeltnerBreakoutConfig,
+        {
+            "trade_size": DEFAULT_TRADE_SIZE,
+            "ema_period": 20,
+            "atr_period": 14,
+            "atr_mult": Decimal("2.0"),
+        },
+    ),
+    "engulfing_pattern": (
+        EngulfingPattern,
+        EngulfingPatternConfig,
+        {"trade_size": DEFAULT_TRADE_SIZE, "use_trend_filter": True},
+    ),
 }
 
 
@@ -75,7 +136,9 @@ def main():
     parser.add_argument("name", nargs="?", default=None, help="策略显示名称")
     parser.add_argument("--metrics", action="store_true", help="启用 InfluxDB 监控导出")
     parser.add_argument("--influx-url", default=os.getenv("INFLUX_URL", "http://localhost:8086"))
-    parser.add_argument("--influx-token", default=os.getenv("INFLUX_TOKEN", "quant-token-change-me"))
+    parser.add_argument(
+        "--influx-token", default=os.getenv("INFLUX_TOKEN", "quant-token-change-me")
+    )
     args = parser.parse_args()
 
     key = args.key

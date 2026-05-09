@@ -9,7 +9,6 @@ import json
 import subprocess
 import sys
 
-
 STRATEGY_KEYS = [
     ("ema_cross", "EMA Cross"),
     ("donchian_breakout", "Donchian Breakout"),
@@ -42,7 +41,9 @@ def main():
             cmd.append("--metrics")
         proc = subprocess.run(
             cmd,
-            capture_output=True, text=True, timeout=300,
+            capture_output=True,
+            text=True,
+            timeout=300,
         )
         if proc.returncode != 0:
             print(f"FAILED (exit {proc.returncode})")
@@ -62,7 +63,7 @@ def main():
                 continue
 
         if json_line is None:
-            print(f"FAILED (no JSON output)")
+            print("FAILED (no JSON output)")
             results.append({"name": name, "status": "error", "note": proc.stdout[-300:]})
             continue
 
@@ -70,13 +71,17 @@ def main():
         results.append(r)
         if r["status"] == "ok":
             pnl_str = f"PnL={r['pnl']:,.2f} USD" if r["pnl"] is not None else "PnL=N/A"
-            print(f"done ({r['elapsed']}s) | orders={r['orders']}, positions={r['positions']}, {pnl_str}")
+            print(
+                f"done ({r['elapsed']}s) | orders={r['orders']}, positions={r['positions']}, {pnl_str}"
+            )
         else:
             print(f"FAILED: {r.get('note', 'unknown')[:120]}")
 
     # ── 汇总 ──
     print("\n" + "=" * 95)
-    print(f"{'Strategy':<24} {'Bars':>8} {'Orders':>8} {'Positions':>10} {'PnL (USD)':>16} {'Time(s)':>8} {'Status':>10}")
+    print(
+        f"{'Strategy':<24} {'Bars':>8} {'Orders':>8} {'Positions':>10} {'PnL (USD)':>16} {'Time(s)':>8} {'Status':>10}"
+    )
     print("=" * 95)
     for r in results:
         status = r.get("status", "ok")
@@ -87,10 +92,14 @@ def main():
             pnl = r.get("pnl")
             pnl_str = f"{pnl:>16,.2f}" if pnl is not None else "             N/A"
             elapsed = r.get("elapsed", 0)
-            print(f"{r['name']:<24} {bars:>8} {orders:>8} {positions:>10} {pnl_str} {elapsed:>8.1f}s {'OK':>10}")
+            print(
+                f"{r['name']:<24} {bars:>8} {orders:>8} {positions:>10} {pnl_str} {elapsed:>8.1f}s {'OK':>10}"
+            )
         else:
             note = r.get("note", "")[:60]
-            print(f"{r['name']:<24} {'-':>8} {'-':>8} {'-':>10} {'-':>16} {'-':>8}s {'FAILED':>10}  {note}")
+            print(
+                f"{r['name']:<24} {'-':>8} {'-':>8} {'-':>10} {'-':>16} {'-':>8}s {'FAILED':>10}  {note}"
+            )
 
     ok_count = sum(1 for r in results if r.get("status") == "ok")
     print(f"\n{ok_count}/{total} strategies completed successfully.")

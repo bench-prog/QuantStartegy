@@ -121,14 +121,8 @@ class FVGGap(Strategy):
 
     def _clean_expired_fvgs(self, curr_close: float) -> None:
         # 如果价格完全穿过 FVG 区域，认为缺口已失效
-        self.bullish_fvgs = [
-            (lo, hi) for lo, hi in self.bullish_fvgs
-            if curr_close > lo
-        ]
-        self.bearish_fvgs = [
-            (lo, hi) for lo, hi in self.bearish_fvgs
-            if curr_close < hi
-        ]
+        self.bullish_fvgs = [(lo, hi) for lo, hi in self.bullish_fvgs if curr_close > lo]
+        self.bearish_fvgs = [(lo, hi) for lo, hi in self.bearish_fvgs if curr_close < hi]
 
     def on_bar(self, bar: Bar) -> None:
         if bar.is_single_price():

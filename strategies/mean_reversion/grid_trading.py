@@ -129,7 +129,9 @@ class GridTrading(Strategy):
                 if idx not in self.position_grids:
                     self.position_grids[idx] = close
                     self.buy()
-                    self.log.info(f"Grid buy @ level {idx} ({self.grids[idx]:.5f})", color=LogColor.GREEN)
+                    self.log.info(
+                        f"Grid buy @ level {idx} ({self.grids[idx]:.5f})", color=LogColor.GREEN
+                    )
 
         # 价格上涨，穿越网格档位 → 卖出（平掉对应档位的买入）
         if curr_idx < prev_idx:
@@ -139,7 +141,9 @@ class GridTrading(Strategy):
                 if idx in self.position_grids:
                     del self.position_grids[idx]
                     self.sell()
-                    self.log.info(f"Grid sell @ level {idx} ({self.grids[idx]:.5f})", color=LogColor.RED)
+                    self.log.info(
+                        f"Grid sell @ level {idx} ({self.grids[idx]:.5f})", color=LogColor.RED
+                    )
 
         self.prev_bar_close = close
 

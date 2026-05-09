@@ -68,8 +68,12 @@ class PairTrading(Strategy):
             self.log.error("Could not find one or both instruments")
             self.stop()
             return
-        self.subscribe_bars(BarType.from_str(f"{self.config.instrument_id_a}-1-MINUTE-LAST-EXTERNAL"))
-        self.subscribe_bars(BarType.from_str(f"{self.config.instrument_id_b}-1-MINUTE-LAST-EXTERNAL"))
+        self.subscribe_bars(
+            BarType.from_str(f"{self.config.instrument_id_a}-1-MINUTE-LAST-EXTERNAL")
+        )
+        self.subscribe_bars(
+            BarType.from_str(f"{self.config.instrument_id_b}-1-MINUTE-LAST-EXTERNAL")
+        )
 
     def on_bar(self, bar: Bar) -> None:
         bar_type_a = BarType.from_str(f"{self.config.instrument_id_a}-1-MINUTE-LAST-EXTERNAL")
@@ -93,7 +97,7 @@ class PairTrading(Strategy):
             )
             return
 
-        window = self.spread_history[-self.config.lookback:]
+        window = self.spread_history[-self.config.lookback :]
         mu = mean(window)
         sigma = stdev(window) if len(window) > 1 else 1.0
         z_score = (spread - mu) / sigma if sigma > 0 else 0.0
@@ -107,7 +111,9 @@ class PairTrading(Strategy):
         short_b = self.portfolio.is_net_short(self.config.instrument_id_b)
 
         if z_score > entry_z and not short_a and not long_b:
-            self.log.info(f"Spread Z={z_score:.2f} > {entry_z}: SHORT A / LONG B", color=LogColor.MAGENTA)
+            self.log.info(
+                f"Spread Z={z_score:.2f} > {entry_z}: SHORT A / LONG B", color=LogColor.MAGENTA
+            )
             if not self.portfolio.is_flat(self.config.instrument_id_a):
                 self.close_all_positions(self.config.instrument_id_a)
             if not self.portfolio.is_flat(self.config.instrument_id_b):
@@ -116,7 +122,9 @@ class PairTrading(Strategy):
             self._submit_market(self.config.instrument_id_b, OrderSide.BUY)
 
         elif z_score < -entry_z and not long_a and not short_b:
-            self.log.info(f"Spread Z={z_score:.2f} < -{entry_z}: LONG A / SHORT B", color=LogColor.MAGENTA)
+            self.log.info(
+                f"Spread Z={z_score:.2f} < -{entry_z}: LONG A / SHORT B", color=LogColor.MAGENTA
+            )
             if not self.portfolio.is_flat(self.config.instrument_id_a):
                 self.close_all_positions(self.config.instrument_id_a)
             if not self.portfolio.is_flat(self.config.instrument_id_b):
@@ -130,7 +138,9 @@ class PairTrading(Strategy):
             self.close_all_positions(self.config.instrument_id_b)
 
     def _submit_market(self, instrument_id: InstrumentId, side: OrderSide) -> None:
-        instrument = self.instrument_a if instrument_id == self.config.instrument_id_a else self.instrument_b
+        instrument = (
+            self.instrument_a if instrument_id == self.config.instrument_id_a else self.instrument_b
+        )
         if instrument is None:
             return
         order = self.order_factory.market(

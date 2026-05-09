@@ -113,7 +113,7 @@ class QuoteFade(Strategy):
             self.buy()
         elif ratio < 1 / threshold and self.portfolio.is_flat(self.config.instrument_id):
             self.log.info(
-                f"Buy volume {buy_volume:.2f} / Sell volume {sell_volume:.2f} = {ratio:.2f} < {1/threshold:.2f}: FADE SHORT",
+                f"Buy volume {buy_volume:.2f} / Sell volume {sell_volume:.2f} = {ratio:.2f} < {1 / threshold:.2f}: FADE SHORT",
                 color=LogColor.MAGENTA,
             )
             self.cooldown = self.config.cooldown_bars

@@ -92,7 +92,9 @@ class RSIReversion(Strategy):
             elif self.portfolio.is_net_long(self.config.instrument_id):
                 self.close_all_positions(self.config.instrument_id)
                 self.sell()
-        elif oversold < rsi_val < overbought and not self.portfolio.is_flat(self.config.instrument_id):
+        elif oversold < rsi_val < overbought and not self.portfolio.is_flat(
+            self.config.instrument_id
+        ):
             self.close_all_positions(self.config.instrument_id)
 
     def buy(self) -> None:

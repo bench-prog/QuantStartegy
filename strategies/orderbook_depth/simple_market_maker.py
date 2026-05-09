@@ -29,8 +29,7 @@
 
 from decimal import Decimal
 
-from nautilus_trader.common.enums import LogColor
-from nautilus_trader.config import PositiveFloat, PositiveInt, StrategyConfig
+from nautilus_trader.config import PositiveInt, StrategyConfig
 from nautilus_trader.model.book import OrderBook
 from nautilus_trader.model.data import OrderBookDeltas, QuoteTick
 from nautilus_trader.model.enums import BookType, OrderSide, TimeInForce

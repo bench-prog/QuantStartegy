@@ -1,0 +1,36 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  # NOTE: mypy strict mode currently reports errors in legacy strategy files.
+  # Enable this hook once existing code has type annotations or after adding
+  # per-file ignores. Run manually with: mypy strategies tests
+  #
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.15.0
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies:
+  #         - nautilus_trader>=1.226
+  #         - pandas>=2.0
+  #         - numpy>=2.0
+  #         - pyarrow>=15.0
+  #         - influxdb-client>=1.40
+  #         - pytest>=8.0
+  #       args: [--ignore-missing-imports]
+  #       exclude: ^(scripts/|data/|grafana/)
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=10240]
+      - id: check-merge-conflict

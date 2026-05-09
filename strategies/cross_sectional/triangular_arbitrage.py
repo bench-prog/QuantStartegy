@@ -37,7 +37,6 @@ from decimal import Decimal
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.model.identifiers import InstrumentId
-from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.trading.strategy import Strategy
 
 from strategies import StrategyMeta, register
@@ -55,11 +54,11 @@ class TriangularArbitrageConfig(StrategyConfig, frozen=True):
     -  如果循环完成后 USDT 增加，则存在套利空间
     """
 
-    pair_a_instrument_id: InstrumentId   # 如 BTCUSDT
+    pair_a_instrument_id: InstrumentId  # 如 BTCUSDT
     pair_a_bar_type: BarType
-    pair_b_instrument_id: InstrumentId   # 如 ETHBTC (BTC 计价)
+    pair_b_instrument_id: InstrumentId  # 如 ETHBTC (BTC 计价)
     pair_b_bar_type: BarType
-    pair_c_instrument_id: InstrumentId   # 如 ETHUSDT
+    pair_c_instrument_id: InstrumentId  # 如 ETHUSDT
     pair_c_bar_type: BarType
     trade_size: Decimal
     # 最小套利收益率阈值

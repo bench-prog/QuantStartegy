@@ -46,8 +46,16 @@ class MetricsActor(Actor):
 
     def on_order_filled(self, event: OrderFilled) -> None:
         side = event.order_side.name
-        price = float(event.last_px.as_double()) if isinstance(event.last_px, Price) else float(event.last_px)
-        qty = float(event.last_qty.as_double()) if isinstance(event.last_qty, Quantity) else float(event.last_qty)
+        price = (
+            float(event.last_px.as_double())
+            if isinstance(event.last_px, Price)
+            else float(event.last_px)
+        )
+        qty = (
+            float(event.last_qty.as_double())
+            if isinstance(event.last_qty, Quantity)
+            else float(event.last_qty)
+        )
         ts = event.ts_event
 
         self.exporter.write_order(

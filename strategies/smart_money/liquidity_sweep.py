@@ -81,7 +81,7 @@ class LiquiditySweep(Strategy):
         self.subscribe_bars(self.config.bar_type)
 
     def _recent_high_low(self) -> tuple[float, float]:
-        recent = self.bars[-self.config.lookback:]
+        recent = self.bars[-self.config.lookback :]
         high = max(float(b.high) for b in recent)
         low = min(float(b.low) for b in recent)
         return high, low

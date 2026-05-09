@@ -17,7 +17,7 @@ from grafana.exporter import InfluxMetricsExporter, MetricsPoint
 __all__ = ["InfluxMetricsExporter", "MetricsPoint"]
 
 try:
-    from grafana.actor import MetricsActor
+    from grafana.actor import MetricsActor  # noqa: F401
 
     __all__.append("MetricsActor")
 except ImportError:

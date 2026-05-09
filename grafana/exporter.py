@@ -11,15 +11,14 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from decimal import Decimal
-from datetime import datetime, timezone
 from typing import Any
-
 
 # influxdb-client 为可选依赖；未安装时 graceful degrade
 try:
     from influxdb_client import InfluxDBClient, Point
-    from influxdb_client.client.write_api import ASYNCHRONOUS, SYNCHRONOUS
+    from influxdb_client.client.write_api import ASYNCHRONOUS
 
     _HAS_INFLUXDB = True
 except ImportError:
@@ -48,9 +47,7 @@ class MetricsPoint:
         for k, v in self.fields.items():
             if isinstance(v, bool):
                 p = p.field(k, v)
-            elif isinstance(v, (int, float)):
-                p = p.field(k, float(v))
-            elif isinstance(v, Decimal):
+            elif isinstance(v, int | float | Decimal):
                 p = p.field(k, float(v))
             else:
                 p = p.field(k, str(v))
@@ -266,7 +263,7 @@ class InfluxMetricsExporter:
 
             for p in batch:
                 if p.timestamp_ns:
-                    ts = datetime.fromtimestamp(p.timestamp_ns / 1e9, tz=timezone.utc).isoformat()
+                    ts = datetime.fromtimestamp(p.timestamp_ns / 1e9, tz=UTC).isoformat()
                 else:
                     ts = "now"
                 print(f"[METRICS] {ts} {p.measurement} {p.tags} {p.fields}")

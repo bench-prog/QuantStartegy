@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Callable, Type
+from typing import Any
 
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.trading.strategy import Strategy
@@ -12,8 +12,8 @@ class StrategyMeta:
     key: str
     name: str
     description: str
-    config_cls: Type[StrategyConfig]
-    strategy_cls: Type[Strategy]
+    config_cls: type[StrategyConfig]
+    strategy_cls: type[Strategy]
     default_params: dict[str, Any] = field(default_factory=dict)
 
 

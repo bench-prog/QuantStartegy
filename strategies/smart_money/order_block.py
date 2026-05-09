@@ -108,7 +108,9 @@ class OrderBlock(Strategy):
             return
 
         # 从后往前检测最近的 swing point
-        for i in range(len(self.bars) - self.config.swing_lookback - 1, self.config.swing_lookback, -1):
+        for i in range(
+            len(self.bars) - self.config.swing_lookback - 1, self.config.swing_lookback, -1
+        ):
             if self._is_swing_low(i):
                 # 找 swing low 形成前的 bearish K 线（推动下跌的 K 线）
                 for j in range(i - 1, max(i - self.config.lookback, -1), -1):
@@ -121,11 +123,16 @@ class OrderBlock(Strategy):
                             low = float(bar.low)
                             high = float(bar.high)
                         self.bullish_ob = (low, high)
-                        self.log.info(f"Bullish OB detected @ idx={j}: {self.bullish_ob}", color=LogColor.GREEN)
+                        self.log.info(
+                            f"Bullish OB detected @ idx={j}: {self.bullish_ob}",
+                            color=LogColor.GREEN,
+                        )
                         break
                 break
 
-        for i in range(len(self.bars) - self.config.swing_lookback - 1, self.config.swing_lookback, -1):
+        for i in range(
+            len(self.bars) - self.config.swing_lookback - 1, self.config.swing_lookback, -1
+        ):
             if self._is_swing_high(i):
                 # 找 swing high 形成前的 bullish K 线（推动上涨的 K 线）
                 for j in range(i - 1, max(i - self.config.lookback, -1), -1):
@@ -138,7 +145,9 @@ class OrderBlock(Strategy):
                             low = float(bar.low)
                             high = float(bar.high)
                         self.bearish_ob = (low, high)
-                        self.log.info(f"Bearish OB detected @ idx={j}: {self.bearish_ob}", color=LogColor.RED)
+                        self.log.info(
+                            f"Bearish OB detected @ idx={j}: {self.bearish_ob}", color=LogColor.RED
+                        )
                         break
                 break
 

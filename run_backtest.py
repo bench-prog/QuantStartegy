@@ -11,20 +11,17 @@ from decimal import Decimal
 
 import pandas as pd
 from nautilus_trader.backtest.engine import BacktestEngine
-from nautilus_trader.config import BacktestEngineConfig
-from nautilus_trader.config import LoggingConfig
-from nautilus_trader.model.data import BarType
+from nautilus_trader.config import BacktestEngineConfig, LoggingConfig
 from nautilus_trader.model import TraderId
 from nautilus_trader.model.currencies import USD
-from nautilus_trader.model.enums import AccountType
-from nautilus_trader.model.enums import OmsType
+from nautilus_trader.model.data import BarType
+from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.identifiers import Venue
 from nautilus_trader.model.objects import Money
 from nautilus_trader.persistence.wranglers import BarDataWrangler
 from nautilus_trader.test_kit.providers import TestInstrumentProvider
 
-from strategies.trend_following.ema_cross import EMACross
-from strategies.trend_following.ema_cross import EMACrossConfig
+from strategies.trend_following.ema_cross import EMACross, EMACrossConfig
 
 # --- 趋势跟踪 (Trend Following) ---
 # from strategies.trend_following.supertrend import SuperTrend, SuperTrendConfig
@@ -59,8 +56,8 @@ from strategies.trend_following.ema_cross import EMACrossConfig
 
 # 数据源配置
 DATA_CSV = "data/fxcm/gbpusd-m1-ask-2012.csv"  # CSV 文件路径
-CURRENCY_PAIR = "GBP/USD"                        # 货币对
-VENUE_NAME = "SIM"                               # 交易所名称
+CURRENCY_PAIR = "GBP/USD"  # 货币对
+VENUE_NAME = "SIM"  # 交易所名称
 
 # 策略配置（替换导入即可切换策略）
 STRATEGY_CLS = EMACross

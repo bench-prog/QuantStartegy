@@ -16,7 +16,6 @@ from nautilus_trader.config import ImportableStrategyConfig, LiveExecEngineConfi
 from nautilus_trader.live.config import TradingNodeConfig
 from nautilus_trader.live.node import TradingNode
 
-
 # ============================================================================
 # === 仅需修改此处 ===
 # ============================================================================
@@ -36,7 +35,7 @@ STRATEGY = ImportableStrategyConfig(
 
 # 执行引擎配置
 EXEC_ENGINE = LiveExecEngineConfig(
-    reconciliation=True,              # 启动时与交易所对账
+    reconciliation=True,  # 启动时与交易所对账
     inflight_check_interval_ms=5000,  # 待确认订单检查间隔
 )
 
@@ -102,7 +101,7 @@ def main():
 
     node = TradingNode(config=config)
 
-    def shutdown(signum, frame):
+    def shutdown(_signum, _frame):
         print("\n[shutdown] Stopping trading node...")
         node.stop()
         sys.exit(0)

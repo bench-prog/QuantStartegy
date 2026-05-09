@@ -30,14 +30,12 @@
 from decimal import Decimal
 from typing import Any
 
-from nautilus_trader.common.enums import LogColor
 from nautilus_trader.config import PositiveFloat, StrategyConfig
 from nautilus_trader.model.book import OrderBook
 from nautilus_trader.model.data import OrderBookDeltas, QuoteTick
 from nautilus_trader.model.enums import BookType, OrderSide, TimeInForce
 from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.model.instruments import Instrument
-from nautilus_trader.model.objects import Quantity
 from nautilus_trader.trading.strategy import Strategy
 
 from strategies import StrategyMeta, register
